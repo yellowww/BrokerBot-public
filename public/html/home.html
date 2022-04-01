@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Activity Monitor</title>
+        <link href="css/home.css" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+        <script src="js/main.js"></script>
+        <script src="js/loader.js"></script>
+        <script src="js/ajax.js"></script>
+        <script src="js/graphing.js"></script>
+        <script src="js/gui.js"></script>
+    <body>
+        <div id="title">Trade algo activity monitor</div>
+        <div id="marketOpen" style="display:none;">Market is not currently open</div>
+        <div id="openConfig" style="display:none;" onclick="document.getElementById('editConfigContainer').style.display='block';gui.lockMainContent();">Edit Configuration</div>
+        <br>
+        <a id="alpacaAnchor" href="https://app.alpaca.markets/paper/dashboard/overview" target="_blank">
+            <div id="subtitle" style="display:none;">Open Alpaca paper portfolio</div>
+        </a><div id="moreInfoAlpaca" onclick="document.getElementById('alpacaInfoContainer').style.display='block';gui.lockMainContent();" style="display:none;">What is Alpaca?</div>
+        <a id="yahooFinanceAnchor" target="_blank">
+            <div id="yahooFinance"></div>
+        </a>
+        <div>
+            <canvas id="loader" width="200" height="200" style="filter:opacity(1);"></canvas>
+            <div id="loadingText" class="loadingText" style="filter:opacity(1);">Loading...</div>
+            <div id="loadingError" class="loadingText" style="display:none;color:rgb(180,0,0)"></div>         
+        </div>
+
+        <div id="infoContainer"">
+            <div id="statTitle"></div>
+            <div class="stat" id="isInvested" style="color:rgb(30,140,30);font-size: 1.75rem;"></div>
+            <div class="stat" id="consistencyScore"></div>
+            <div class="stat" id="periodLength"></div>
+            <div class="stat" id="profitTime"></div>
+            <div class="stat" id="purchaseTime"></div>
+            <div class="stat" id="estimatedProfit"></div>
+            <div id="moreInfoButton" style="display:none;" onclick="document.getElementById('moreInfoContainer').style.display='block';gui.lockMainContent();">What is this algorithm?</div>
+        </div>
+        <div id="graphContainer" style="display: none;">
+            <canvas id="graphCanvas"></canvas>
+            <image src="assets/legend.png" id="graphLegend"></image>
+        </div>
+        <div id="editConfigContainer" class="infoContainer"style="display:none;">
+            <div class="infoTitle">Configuration <div style="font-size: 2rem; display: inline-block;font-weight: 400;cursor:pointer;" onclick="gui.closeOverlays({key:'Escape'});">press esc / click to close</div></div>
+            <form action="changeConfig" method="post">
+                <div class="infoP" >
+                    <div style="font-size: 2rem;">Change Alpaca API keys: </div><br>
+                    To change API keys, run <div class="codeLine">node updateKeys.js</div> in your server command prompt, then reload the page.
+                </div>
+                <div class="infoP">
+                    <div style="font-size: 2rem;">Change risk factor:</div>
+                    Risk factor determines how the algorithm optimizes for profitabilty or consitancy, see more about this in "What is this algorithm".<br><br>
+                    <input type="range" id="riskRange" name="riskRange" min="0" max="1000" oninput="
+                        document.getElementById('riskRangeValue').innerHTML = 'risk percent: '+(document.getElementById('riskRange').value/10)+'%';
+                    ">
+                    
+                    <div id="riskRangeValue" style="display:inline-block;"></div><br><br>
+                    You must restart the server for changes to take effect.
+                </div>
+                <input type="submit" value="Update Configuration" id="updateConfigButton">
+            </form>
+        </div>
+        <div id="alpacaInfoContainer" class="infoContainer" style="display:none;">
+            <div class="infoTitle">What is Alpaca? <div style="font-size: 2rem; display: inline-block;font-weight: 400;cursor:pointer;" onclick="gui.closeOverlays({key:'Escape'});">press esc / click to close</div></div>
+            <div class="infoP">
+                Alpaca is a trading API, that allows you to trade, hold and view paper stocks in an algorithm.<br>
+                You do need an alpaca account to use this application.
+                <a class="linkEmbed" href="https://app.alpaca.markets/signup" target="_blank">Create one here</a>
+            </div>
+            <div class="infoP">
+                This application uses paper money, this has no value and can not be used outside Alpaca.<br>
+                <div style="font-size: 2rem;font-weight: 600;color:rgb(180,180,30);display:inline-block;">This application is not intended to be used with actual money</div><br>
+                This is mearly a fun test to see if I could make an algoritm that could be profitable.
+            </div>
+            <div class="closeText">press esc to close</div>
+        </div>
+        <div id="moreInfoContainer" class="infoContainer" style="display:none;">
+            <div class="infoTitle">What is this algorithm? <div style="font-size: 2rem; display: inline-block;font-weight: 400;cursor:pointer;" onclick="gui.closeOverlays({key:'Escape'});">press esc / click to close</div></div>
+            <div class="infoP">
+                This algorithm looks for stocks that follow a specific trend.<br>
+                It scans all stocks in the NASDAQ for steady growth and the presence of peaks and drop-offs.<br>
+                This trend looks something like this:<br>
+                <image src="assets/moreInfoAssets/trendModel.png" class="infoImage"></image>
+            </div>
+            
+            <div class="infoP">
+                We can find how well the peaks/drop-offs of a stock fit this trend by finding the slopes of <div class="codeLine">(peak[n] and dropoff[n])*-1</div>, then comparing them to each other and finally averaging the results. <br><br>We can repeat this with <div class="codeLine">dropoff[n] and peak[n+1]</div>,
+                then averaging the two results.<br><br>
+                Make sure to invert all slopes that are less than one.<br><br>
+                This will give us a consistency score greater or equal to one, which repersents how well this stock fits the trend we are looking for, where one is the best possible score.
+            </div>
+            <div class="infoP">
+                We can also calculate the average period length (The average time inbetween each peak).<br>
+                Now, like we did above, we can compare each period length to every other to grade the consistency of the periods.<br><br>
+                We now incorperate this period score into the previously established consistency score where: <div class="codeLine">newScore=(consistencyScore*0.7)+(periodScore*0.3)</div>
+            </div>
+            <div class="infoP">
+                Now we need to see how consistent the longer trends are. (Looking for steady upward growth)<br>
+                We can do this by running linear regressions on the peaks as well as the drop-offs to get the upper and lower bounds.<br><br>
+                Once we do this, we can look at the coefficient of determination and throw out any stocks where it is less than 0.7.
+            </div>
+            <div class="infoP">
+                These calculations are only ran once every week or if you change the time scale, as they require some time to receive all the data from the alpaca API.
+            </div>
+            <div class="infoP">
+                Now using the average period length and bounds, we can calculate when the stock is estimated to peak and drop-off.<br><br>
+                After evaluating the consistancy score, the algorithm will weight it with the potential profitability based on your risk.<br>
+                Where risk = 0%: finalScore is 100% conistancy, 0% profitabilty.<br>
+                Where risk = 100%: finalScore is 0% conistancy, 100% profitabilty.
+            </div>
+            <div class="infoP">
+                If you are not currently invested, the algorithm finds the stock with the highest finalScore.<br><br>
+                If the price of the stock is less than or equal to what the estimated drop-off will be, and the time is within 60% of the estimated time, then it will buy the stock.<br><br>
+                If the price of the stock is significatly lower than the estimate, then it will not buy.
+            </div>
+            <div class="infoP">
+                If you are currently invested, then the algorithm will only look at the stock you are invested in.<br><br>
+                If the price of the stock is at or above what the algorithm thinks it will peak at, it will sell.<br>
+                After the algorithm purchases a stock, if it does not preform as expected, the program will lower the necesary price to sell.
+            </div>
+            <div class="closeText">Press esc to close</div>
+        </div>
+    </body>
+</html>

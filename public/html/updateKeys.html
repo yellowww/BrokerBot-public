@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Update Your API Keys</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+        <link href="css/home.css" rel="stylesheet">
+        <script src="js/gui.js"></script>
+        <script>
+            window.onkeydown = gui.closeKeyOverlays;
+        </script>
+    </head>
+    <body>
+        <div id="title">Update Your Alpaca API Keys</div>
+        <div id="whatIsAlpacaLabel" onclick="
+            document.getElementById('alpacaInfoContainer').style.display = 'block';
+            gui.lockMainContent();
+        ">What is Alpaca?</div><br>
+        <form action="changeAPIKeys" method="post">
+            <div class="inputTitle">Enter your new API key:</div><br>
+            <input type="password" id="apiKey" name="apiKey" class="passwordInput"><br>
+            <div class="inputTitle">Enter your new secret key:</div><br>
+            <input type="password" id="secretKey" name="secretKey" class="passwordInput"><br>
+            <input type="submit" value="Update Keys" class="inputSubmit">
+        </form>
+        <div class="infoP" style="border-top:0.1cm solid rgb(170, 170, 190);padding-top: 3rem;margin-bottom: 3rem;">You can find Your API keys in your Alpaca paper portfolio overview.<br>
+            Note: Your secret key will only be visible the first time you load it. If you can not see it, you must regenerate your keys.<br>
+            <image src="assets/updateKeys/alpacaKeys.png" class="infoImage"></image>
+        </div>
+
+        <div id="alpacaInfoContainer" class="infoContainer" style="display:none;">
+            <div class="infoTitle">What is Alpaca? <div style="font-size: 2rem; display: inline-block;font-weight: 400;cursor:pointer;" onclick="gui.closeKeyOverlays({key:'Escape'});">press esc / click to close</div></div>
+            <div class="infoP">
+                Alpaca is a trading API, that allows you to trade, hold and view paper stocks in an algorithm.<br>
+                You do need an alpaca account to use this application.
+                <a class="linkEmbed" href="https://app.alpaca.markets/signup" target="_blank">Create one here</a>
+            </div>
+            <div class="infoP">
+                This application uses paper money, this has no value and can not be used outside Alpaca.<br>
+                <div style="font-size: 2rem;font-weight: 600;color:rgb(180,180,30);display:inline-block;">This application is not intended to be used with actual money</div><br>
+                This is mearly a fun test to see if I could make an algoritm that could be profitable.
+            </div>
+            <div class="closeText">press esc to close</div>
+        </div>
+    </body>
+</html>
