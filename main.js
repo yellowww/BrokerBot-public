@@ -3,8 +3,8 @@ const analizer = require('./brokerMods/analize.js');
 const invest = require('./brokerMods/invest.js');
 
 const fs = require('fs');
-
-const env = {
+let envSaved = false;
+let env = {
     pendingOrder:false,
     orderSide:undefined,
     orderSymbol:undefined,
@@ -14,16 +14,18 @@ let config;
 let currentFocus; // ticker data that the algorithm is looking to invest in
 
 init = () => {
-    main.loadConfig((loaded)=> {
-        exports.config = loaded;
-        config = loaded;
-        market.preformLogin(loaded);
-        setTimeout(()=> {
-            main.checkForDifferentConfig((reloadInvestments)=> {
-                if(reloadInvestments) main.gatherTickerData(main.initiateProfitScan);
-                else main.initiateProfitScan();
-            });            
-        },500)
+    main.loadEnv(()=> {
+        main.loadConfig((loaded)=> {
+            exports.config = loaded;
+            config = loaded;
+            market.preformLogin(loaded);
+            setTimeout(()=> {
+                main.checkForDifferentConfig((reloadInvestments)=> {
+                    if(reloadInvestments) main.gatherTickerData(main.initiateProfitScan);
+                    else main.initiateProfitScan();
+                });            
+            },500)
+        });
     });
 
 };
@@ -290,13 +292,51 @@ let main = {
         if(now.getDay() == 0 || now.getDay() == 6) return false;
         return true;
     },
-    exitCleanup:() => {
-        console.log("\x1b[31m-------------------\nError contacting Alpaca API, this could mean: \n\n     1) You have outdated API keys.\n        Enter \x1b[36mnode updateKeys.js\x1b[31m and navigate to \x1b[36mhttp://localhost:3006\x1b[31m to change API keys.\n\n     2) This error could also be caused by an interuption in your internet connection.\n-------------------\x1b[0m");
-        setTimeout(()=>process.exit(0),200);
+    exitCleanup:(error,origin) => {
+        const errorMessage = {
+            error:error.stack,
+            type:error.code,
+            timestamp:new Date().toISOString()
+        }
+        fs.readFile('./data/errorLog.json', 'utf8',(err,file) => {
+            if(err) console.error(err);
+            const previousErrors = JSON.parse(file);
+            previousErrors.errors.push(errorMessage);
+            fs.writeFile('./data/errorLog.json',JSON.stringify(previousErrors),(err) => {
+                if(err)console.log("error writing to error log: \n"+err);
+                main.writeEnv(() => {
+                    console.log("\x1b[31m-------------------\nError contacting Alpaca API, this could mean: \n\n     1) You have outdated API keys.\n        Stop the server and enter \x1b[36mnode updateKeys.js\x1b[31m, then navigate to \x1b[36mhttp://localhost:3006\x1b[31m to change API keys.\n\n     2) This error could also be caused by an interuption in your internet connection.\n\n     3) This issue will also be thrown if the port 3006 is already in use.\n\n     If the issue persists it is caused by an internal error.\n     Errors loged to data/errorLog.json \n-------------------\x1b[0m");
+                    setTimeout(()=>process.exit(0),200);                    
+                });
+            });
+        });
+
+    },
+    envCleanup:() => {
+        main.writeEnv(() => {
+            setTimeout(()=>{process.exit(1);},50);
+        })
     },
     updateConfig:(loaded)=> {
         config = loaded
         exports.config = loaded;
+    },
+    loadEnv:(cb) => {
+        fs.readFile("./data/env.json", "utf8",(err,file) => {
+            if(err)console.log(err);
+            env = JSON.parse(file);
+            cb();
+        });
+    },
+    writeEnv:(cb) => {
+        if(!envSaved) {
+            envSaved = true;
+            fs.writeFile("./data/env.json",JSON.stringify(env),(err) => {
+                if(err)console.log(err);
+                cb();
+            }); 
+        }
+
     }
 }
 
@@ -348,3 +388,4 @@ exports.compileViewData = compileViewData;
 exports.exitCleanup = main.exitCleanup;
 exports.loadConfig = main.loadConfig;
 exports.updateConfig = main.updateConfig;
+exports.envCleanup = main.envCleanup

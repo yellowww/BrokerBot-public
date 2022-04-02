@@ -35,11 +35,11 @@
  1) Run ```node index.js``` in your command prompt to start the algorithm, do this any time you want to restart it.
 <br>
 
-### If this is the first time running the program, you will have to wait for it to gather important data. This will take about 10-15 minutes. 
-### (You will only have to do this the first time you run it, and every 2 weeks after that).
+ If this is the first time running the program, you will have to wait for it to gather important data. This will take about 10-15 minutes. <br>
+ (You will only have to do this the first time you run it, and every 2 weeks after that).
 <br>
 
-### 7) When this process has finished, the algorithm will start. Navigate to ```http://localhost:3006``` to view details about what the algorithm is doing.
+ 7) When this process has finished, the algorithm will start. Navigate to ```http://localhost:3006``` to view details about what the algorithm is doing.
 <br>
 
 ### It should look something like this:
