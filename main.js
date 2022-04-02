@@ -305,7 +305,7 @@ let main = {
             fs.writeFile('./data/errorLog.json',JSON.stringify(previousErrors),(err) => {
                 if(err)console.log("error writing to error log: \n"+err);
                 main.writeEnv(() => {
-                    console.log("\x1b[31m-------------------\nError contacting Alpaca API, this could mean: \n\n     1) You have outdated API keys.\n        Stop the server and enter \x1b[36mnode updateKeys.js\x1b[31m, then navigate to \x1b[36mhttp://localhost:3006\x1b[31m to change API keys.\n\n     2) This error could also be caused by an interuption in your internet connection.\n\n     3) This issue will also be thrown if the port 3006 is already in use.\n\n     If the issue persists it is caused by an internal error.\n     Errors loged to data/errorLog.json \n-------------------\x1b[0m");
+                    console.log("\x1b[31m-------------------\nError contacting Alpaca API, this could mean: \n\n     1) You have outdated API keys.\n        Enter \x1b[36mnode updateKeys.js\x1b[31m, then navigate to \x1b[36mhttp://localhost:3006\x1b[31m to change API keys.\n\n     2) This error could also be caused by an interuption in your internet connection.\n\n     3) This issue will also be thrown if the port 3006 is already in use.\n\n     If the issue persists it is caused by an internal error.\n     Errors loged to data/errorLog.json \n-------------------\x1b[0m");
                     setTimeout(()=>process.exit(0),200);                    
                 });
             });
