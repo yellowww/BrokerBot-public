@@ -13,33 +13,33 @@
  1) You must have [Node.js](https://nodejs.org) installed on the computer acting as a server.
 <br>
 
- 1) You also need an alpaca paper trading account that this algorithm will use to place trades. Create one [here](https://app.alpaca.markets/signup).
+ 2) You also need an alpaca paper trading account that this algorithm will use to place trades. Create one [here](https://app.alpaca.markets/signup).
 <br>
 
-1) Once on the Alpaca paper trading dashboard, click the ```Generate New Key``` button. Don't close this tab!
+ 3) Once on the Alpaca paper trading dashboard, click the ```Generate New Key``` button. Don't close this tab!
 <br>
 
- 1) Download or clone this repo onto your server.
+ 4) Download or clone this repo onto your server.
 <br>
 
- 1) In your command promopt, cd into the folder.
+ 5) In your command promopt, cd into the folder.
 <br>
 
- 1) Run ```node updateKeys.js```.
+ 6) Run ```node updateKeys.js```.
 
 <br>
 
- 5) Navigate to ```http://localhost:3006``` in your web-browser and enter your keys from Alpaca. You can now close the Alpaca dashboard tab.
+ 7) Navigate to ```http://localhost:3006``` in your web-browser and enter your keys from Alpaca. You can now close the Alpaca dashboard tab.
 <br>
 
- 1) Run ```node index.js``` in your command prompt to start the algorithm, do this any time you want to restart it.
+ 8) Run ```node index.js``` in your command prompt to start the algorithm, do this any time you want to restart it.
 <br>
 
  If this is the first time running the program, you will have to wait for it to gather important data. This will take about 10-15 minutes. <br>
  (You will only have to do this the first time you run it, and every 2 weeks after that).
 <br>
 
- 7) When this process has finished, the algorithm will start. Navigate to ```http://localhost:3006``` to view details about what the algorithm is doing.
+ 9) When this process has finished, the algorithm will start. Navigate to ```http://localhost:3006``` to view details about what the algorithm is doing.
 <br>
 
 ### It should look something like this:
@@ -66,7 +66,7 @@
  Don't worry if the expected trend never happened, because the algorithm will not update the data, it just means that the sell point will be lowered, only giving you half the expected profit. 
 <br><br>
 
- If you are very worried that the stock you are invested in will suddenly, unexpectedly boom in price, loosing you potential profit, then you can force the algorithm to re-assess the stocks.
+ If you are very worried that the stock you are invested in will suddenly, unexpectedly rise in price, loosing you potential profit, then you can force the algorithm to re-assess the stocks.
 
  To do this, you must set the ```timestamp``` property in ```data/configData.json``` to ```0``` and restart the server by pressing ```ctrl+c``` followed by ```node index.js``` in the command prompt.
 <br>
