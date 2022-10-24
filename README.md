@@ -68,7 +68,7 @@
 
  If you are very worried that the stock you are invested in will suddenly, unexpectedly rise in price, loosing you potential profit, then you can force the algorithm to re-assess the stocks.
 
- To do this, you must set the ```timestamp``` property in ```data/configData.json``` to ```0``` and restart the server by pressing ```ctrl+c``` followed by ```node index.js``` in the command prompt.
+ To do this, you must set the ```timestamp``` property in ```data/investData.json``` to ```0``` and restart the server by pressing ```ctrl+c``` followed by ```node index.js``` in the command prompt.
 <br>
 
 ---
